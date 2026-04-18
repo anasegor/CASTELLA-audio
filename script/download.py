@@ -91,9 +91,18 @@ def download(yids, output_dir, is_video=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download audio or video")
     parser.add_argument("input_file", help="Path to the input JSON file")
+    
+    # Changed to an optional argument with a default of None
+    parser.add_argument(
+        "--output_dir", "-o", 
+        default=None, 
+        help="Custom output directory (defaults to download/audio or download/video)"
+    )
+    
     parser.add_argument(
         "--video", action="store_true", help="Download video instead of audio"
     )
+    
     args = parser.parse_args()
     is_video = args.video
 
@@ -102,7 +111,12 @@ if __name__ == "__main__":
         data = json.load(infile)
 
     yids = [item["yid"] for item in data]
-    output_dir = (
-        Path("download") / "audio" if not is_video else Path("download") / "video"
-    )
-    download(yids, output_dir=output_dir, is_video=is_video)
+
+    # Check if the user provided an output_dir
+    if args.output_dir:
+        output_path = Path(args.output_dir) / ("video" if is_video else "audio")
+    else:
+        # Fallback to the hard-coded default logic
+        output_path = Path("download") / ("video" if is_video else "audio")
+
+    download(yids, output_dir=output_path, is_video=is_video)
