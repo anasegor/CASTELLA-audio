@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     # Check if the user provided an output_dir
     if args.output_dir:
-        output_path = Path(args.output_dir)
+        output_path = Path(args.output_dir) / ("video" if is_video else "audio")
     else:
         # Fallback to the hard-coded default logic
         output_path = Path("download") / ("video" if is_video else "audio")
