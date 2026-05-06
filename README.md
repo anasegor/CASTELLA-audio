@@ -21,3 +21,6 @@ uv run script/download.py {JSON FILE OF CASTELLA} -v  # If you want to download 
 uv run script/extract_audio_feature.py {JSON FILE OF CASTELLA}  # e.g., `CASTELLA/json/en/train.json`
 uv run script/extract_text_feature.py {AUDIO FOLDER}  # e.g., ./download/audio
 ```
+
+### Full audio data
+If you cannot download audio, please contact the following email: `hokuto.munakata@gmail.com`
