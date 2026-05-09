@@ -12,9 +12,9 @@ def save_audio_feat(list_wav, output_dir, extractor):
         path_feats = output_dir / f"{path_wav.stem}.npz"
         if path_feats.exists():
             continue
-        feat, proj_feat = extractor.extract_audio_feats(str(path_wav))
+        feat, proj_feat, proj_global_feat = extractor.extract_audio_feats(str(path_wav))
 
-        np.savez(path_feats, features=feat)
+        np.savez(path_feats, features=feat, proj_global_feat=proj_global_feat)
 
 
 class ClapExtractor:
@@ -29,6 +29,7 @@ class ClapExtractor:
             print("Inference on CPU")
 
         self.sl_win = SlidingWindos(win_sec, hop_sec)
+        self.sl_win_global = SlidingWindos(10.0, 10.0)
 
     @torch.no_grad()
     def extract_audio_feats(self, path_wav):
@@ -44,8 +45,15 @@ class ClapExtractor:
         feats = feats.cpu().numpy()
         proj_feats = proj_feats.cpu().numpy()
 
-        return feats, proj_feats
+        frames_10 = self.sl_win_global(audio[0], sr)
+        frames_10 = frames_10.cuda() if self.use_cuda else frames_10
 
+        feats_10 = self.wrapper.clap.audio_encoder.base(frames_10)["embedding"]
+        proj_feats_10 = self.wrapper.clap.audio_encoder.projection(feats_10)
+
+        proj_global_feat = proj_feats_10.cpu().numpy().mean(axis=0)
+
+        return feats, proj_feats, proj_global_feat
 
 class SlidingWindos:
     def __init__(self, win_sec, hop_sec):

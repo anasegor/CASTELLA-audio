@@ -21,7 +21,7 @@ def save_text_feat(json_path, output_dir, extractor):
             feat, proj_feat = extractor.extract_text_feats(_m["local_caption"])
 
             path_feats = output_dir / f"qid{_d['yid']}_{idx + 1}.npz"
-            np.savez(path_feats, last_hidden_state=feat)
+            np.savez(path_feats, last_hidden_state=feat, proj_feat=proj_feat)
 
 
 class ClapExtractor:
